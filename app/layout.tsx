@@ -5,7 +5,7 @@ import { Roboto } from "next/font/google";
 import { ThemeProvider, CssBaseline, Box } from "@mui/material";
 import theme from "../theme";
 import { usePathname } from "next/navigation";
-import AppLayout from "./components/appLayout";
+import AppLayout from "../components/appLayout";
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700"],

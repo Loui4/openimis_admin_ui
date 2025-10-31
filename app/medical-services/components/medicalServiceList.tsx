@@ -1,5 +1,5 @@
 'use client'
-import { DataGridComponent } from "@/app/components/dataGrid";
+import { DataGridComponent } from "@/components/dataGrid";
 import { MedicalService, PriceList, Product } from "@/interface";
 import {  GridColDef } from "@mui/x-data-grid";
 import { FC } from "react";
