@@ -13,3 +13,24 @@ export interface PriceList {
   DatePL: Date;
   NumberOfServices: number;
 }
+
+export interface MedicalService {
+  ServiceID: number;
+  ServiceUUID: string;
+  ServCode: string;
+  ServName: string;
+  ServType: string;
+  ServLevel: string;
+  ServPrice: number;
+  ServCareType: string;
+  ServFrequency?: number;
+  ServPatCat: number;
+  ValidityFrom: string;
+  ValidityTo?: string | null;
+  AuditUserID: number;
+  MaximumAmount?: number;
+  manualPrice: boolean;
+  ServPackageType: string;
+  ServCategory?: string;
+  LegacyID?: number;
+}
