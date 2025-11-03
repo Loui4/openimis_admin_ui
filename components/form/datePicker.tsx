@@ -39,11 +39,11 @@ export const FormDatePicker: FC<Prop> = ({
     getValue && getValue(value);
   }, [value]);
 
-  let initialDate = "";
+  let initialDate: string | null = null;
 
-  if (typeof initialValues == "object" && initialValues !== null) {
-    //@ts-ignore
-    initialDate = initialValues[name] as Date;
+  if (typeof initialValues === "object" && initialValues !== null) {
+    // @ts-ignore
+    initialDate = initialValues[name] as string;
   }
 
   return (
@@ -60,24 +60,23 @@ export const FormDatePicker: FC<Prop> = ({
             "& fieldset": { borderRadius: "5px" },
             ...sx,
           }}
-          defaultValue={dayjs(initialDate)}
-          label="" // Keep label empty to avoid internal label rendering
+          defaultValue={initialDate ? dayjs(initialDate) : null}
+          label="" // keep label empty to avoid internal label rendering
           onChange={(dateValue: any) =>
-            setFieldValue(name, dayjs(dateValue).format("YYYY-MM-DD"))
+            setFieldValue(
+              name,
+              dateValue ? dayjs(dateValue).format("YYYY-MM-DD") : ""
+            )
           }
           disabled={disabled}
-          onClose={() => {
-            onBlur?.(value);
-          }}
+          onClose={() => onBlur?.(value)}
           slotProps={{
             textField: {
-              onBlur: (value: any) => {
-                onBlur?.(value); // Call your onBlur prop
-              },
+              onBlur: (value: any) => onBlur?.(value),
             },
           }}
         />
-        <Typography color={"red"} variant="subtitle2">
+        <Typography color="red" variant="subtitle2">
           {errorMessage}
         </Typography>
       </Box>

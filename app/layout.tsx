@@ -22,7 +22,7 @@ export default function RootLayout({
   const pathname = usePathname();
 
   // Paths that should NOT display the AppBar/Drawer
-  const isAuthPage = pathname === "/login";
+  const isAuthPage = pathname === "/";
 
   return (
     <html lang="en" className={roboto.variable}>

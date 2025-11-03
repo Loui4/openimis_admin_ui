@@ -5,7 +5,6 @@ import { SxProps } from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
 import { useFormikField } from "@/hooks";
 
-
 type Prop = {
   id: string;
   name: string;
@@ -43,7 +42,7 @@ export const TextInputField: FC<Prop> = ({
   multiline = false,
   inputIcon,
   unitOfMeasure,
-  helperTextWidth = "25ch",
+  helperTextWidth = "100%",
   externalValue, // Now using externalValue instead of externalData
   handleBlurEvent,
   onChange,
@@ -65,7 +64,7 @@ export const TextInputField: FC<Prop> = ({
   return (
     <FormControl
       variant="standard"
-      sx={{ mb: "1ch", fontSize: "0.76rem", ...sx }}
+      sx={{ mb: "1ch", fontSize: "0.76rem", width: "100%", ...sx }}
     >
       <InputLabel shrink htmlFor={id}>
         {label}

@@ -26,7 +26,6 @@ export const useFormikField = <T extends FormikValues = FormikValues>(
     handleChange,
     handleBlur,
   } = context;
-
   // Safely get field value with fallback
   const value = useMemo(() => values?.[fieldName], [values, fieldName]);
 

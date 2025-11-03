@@ -12,6 +12,7 @@ export interface PriceList {
   PLServName: string;
   DatePL: Date;
   NumberOfServices: number;
+  Services: MedicalService[]
 }
 
 export interface MedicalService {

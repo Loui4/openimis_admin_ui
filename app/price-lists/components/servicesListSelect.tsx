@@ -12,11 +12,8 @@ import {
 } from "@mui/material";
 import { MedicalService, PriceList } from "@/interface";
 import { useParams, useRouter } from "next/navigation";
-import {
-  createPriceListDetail,
-  savePriceListDetailsAction,
-} from "@/services/priceListDetail";
-import { getOnePriceLIst } from "@/services/priceList";
+import { savePriceListDetailsAction } from "@/services/priceListDetail";
+import { getOnePriceList } from "@/services/priceList";
 
 interface Props {
   medicalServiceList: MedicalService[];
@@ -27,7 +24,6 @@ export function MedicalServiceListSelect({ medicalServiceList }: Props) {
   const router = useRouter();
   const [filter, setFilter] = useState("");
   const [priceList, setPriceList] = useState<PriceList>({} as PriceList);
-
   const [selectedServices, setSelectedServices] = useState<MedicalService[]>(
     []
   );
@@ -57,31 +53,55 @@ export function MedicalServiceListSelect({ medicalServiceList }: Props) {
   };
 
   const handleSaveServices = async () => {
-    const formattedServices = selectedServices.map((service) => {
-      return {
-        ServiceID: service.ServiceID,
-        ValidityFrom: "2025-10-30T00:00:00Z",
-      };
-    });
+    const formattedServices = selectedServices.map((service) => ({
+      ServiceID: service.ServiceID,
+      ValidityFrom: "2025-10-30T00:00:00Z", // adjust if needed
+    }));
 
-    const data = await savePriceListDetailsAction(
-      params.id as string,
-      formattedServices
-    );
+    await savePriceListDetailsAction(params.id as string, formattedServices);
     router.push("/price-lists");
   };
 
   useEffect(() => {
     async function findPriceList() {
-      const priceList = await getOnePriceLIst(45);
-      setPriceList(priceList);
+      const fetchedPriceList = await getOnePriceList(
+        params?.id as unknown as number
+      );
+      setPriceList(fetchedPriceList);
+
+      // Auto-select services already attached
+      if (fetchedPriceList.Services) {
+        setSelectedServices(
+          fetchedPriceList.Services.map((s: any) => ({
+            ServiceID: s.ServiceID,
+            ServiceUUID: s.ServiceUUID ?? "", // fallback
+            ServCode: s.ServiceCode,
+            ServName: s.ServiceName,
+            ServType: s.ServType ?? "",
+            ServLevel: s.ServLevel ?? "",
+            ServPrice: s.PriceOverule ?? 0,
+            ServCareType: s.ServCareType ?? "",
+            ServFrequency: s.ServFrequency ?? 0,
+            ServPatCat: s.ServPatCat ?? 0,
+            ValidityFrom: s.ValidityFrom ?? "2025-10-30T00:00:00Z",
+            ValidityTo: s.ValidityTo ?? null,
+            AuditUserID: s.AuditUserID ?? 0,
+            MaximumAmount: s.MaximumAmount ?? 0,
+            manualPrice: s.manualPrice ?? false,
+            ServPackageType: s.ServPackageType ?? "",
+            ServCategory: s.ServCategory ?? "",
+            LegacyID: s.LegacyID ?? 0,
+          }))
+        );
+      }
     }
     findPriceList();
-  }, []);
+  }, [params?.id]);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <h1>{priceList.PLServName}</h1>
+
       <Button
         onClick={handleSaveServices}
         variant="contained"
@@ -90,34 +110,42 @@ export function MedicalServiceListSelect({ medicalServiceList }: Props) {
       >
         Save Selected Services
       </Button>
+
       {/* Selected Chips */}
       {selectedServices.length > 0 && (
-        <Stack
-          direction="row"
-          flexWrap="wrap"
-          spacing={1} // horizontal spacing between chips
-          rowGap={1} // vertical spacing between lines
+        <Box
+          sx={{
+            maxHeight: 120, // fixed height
+            overflowY: "auto", // scroll if content exceeds height
+            border: "1px solid #e0e0e0",
+            borderRadius: 1,
+            p: 1,
+          }}
         >
-          {selectedServices.map((s) => (
-            <Chip
-              key={s.ServCode}
-              label={s.ServName}
-              variant="outlined"
-              onDelete={() => handleChipDelete(s.ServCode)}
-              sx={{
-                borderColor: "#006273",
-                color: "#006273",
-                "& .MuiChip-deleteIcon": { color: "#006273" },
-                "&:hover": {
-                  backgroundColor: "rgba(0, 98, 115, 0.04)", // subtle hover fill
-                  borderColor: "#005561",
-                  color: "#005561",
-                  "& .MuiChip-deleteIcon": { color: "#005561" },
-                },
-              }}
-            />
-          ))}
-        </Stack>
+          <Stack direction="row" flexWrap="wrap" spacing={1} rowGap={1}>
+            {selectedServices.map((s, index) => (
+              <Chip
+                key={
+                  s.ServCode + " " + s.ServiceID + "" + s.ServName + "" + index
+                }
+                label={s.ServName}
+                variant="outlined"
+                onDelete={() => handleChipDelete(s.ServCode)}
+                sx={{
+                  borderColor: "#006273",
+                  color: "#006273",
+                  "& .MuiChip-deleteIcon": { color: "#006273" },
+                  "&:hover": {
+                    backgroundColor: "rgba(0, 98, 115, 0.04)",
+                    borderColor: "#005561",
+                    color: "#005561",
+                    "& .MuiChip-deleteIcon": { color: "#005561" },
+                  },
+                }}
+              />
+            ))}
+          </Stack>
+        </Box>
       )}
 
       {/* Search Field */}
@@ -162,9 +190,9 @@ export function MedicalServiceListSelect({ medicalServiceList }: Props) {
         <Divider />
 
         {/* Rows */}
-        {filteredRows.map((s) => (
+        {filteredRows.map((s, index) => (
           <Box
-            key={s.ServCode}
+            key={s.ServCode + "" + s.ServiceID + "" + s.ServName + "" + index}
             sx={{
               display: "flex",
               px: 2,
