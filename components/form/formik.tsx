@@ -4,7 +4,6 @@ import { Button, SxProps } from "@mui/material";
 import { Formik, Form } from "formik";
 import { ReactNode, FC, useEffect } from "react";
 
-
 type Prop = {
   onSubmit: (values: any, actions: any) => void;
   children:
@@ -61,6 +60,7 @@ export const FormikInit: FC<Prop> = ({
               sx={{ mt: 3 }}
               variant={submitVariant === "text" ? "text" : "contained"}
               onClick={() => {}}
+              type="submit"
             >
               {loading ? (
                 <i style={{ textTransform: "lowercase" }}>loading...</i>

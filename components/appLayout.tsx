@@ -28,6 +28,7 @@ import LocalPharmacyIcon from "@mui/icons-material/LocalPharmacy";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const drawerWidth = 240;
 
@@ -66,10 +67,20 @@ export default function AppLayout({ children }: Props) {
 
   const drawer = (
     <div>
-      <Toolbar>
-        <Typography variant="h6" noWrap>
-          Admin Panel
-        </Typography>
+      <Toolbar
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          py: "2ch",
+        }}
+      >
+        <Image
+          src="/logo.png" // Path in your /public folder
+          alt="logo"
+          width={70}
+          height={70}
+        />
       </Toolbar>
       <Divider />
       <List>

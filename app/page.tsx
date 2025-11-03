@@ -12,10 +12,13 @@ import {
   Paper,
 } from "@mui/material";
 import { Visibility, VisibilityOff, LockOutlined } from "@mui/icons-material";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -24,6 +27,7 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Login submitted:", form);
+    router.push("/products");
     // TODO: handle authentication logic (e.g., call API)
   };
 
@@ -47,21 +51,15 @@ export default function LoginPage() {
         }}
       >
         <Box sx={{ mb: 3 }}>
-          <LockOutlined
-            color="primary"
-            sx={{
-              fontSize: 50,
-              backgroundColor: "primary.light",
-              borderRadius: "50%",
-              p: 1,
-              color: "white",
-            }}
+          <Image
+            src="/logo.png" // Path in your /public folder
+            alt="logo"
+            width={100}
+            height={100}
           />
+
           <Typography variant="h5" fontWeight={600} sx={{ mt: 2 }}>
-            Welcome Back
-          </Typography>
-          <Typography color="text.secondary">
-            Sign in to continue to your account
+            SLA
           </Typography>
         </Box>
 
@@ -112,18 +110,6 @@ export default function LoginPage() {
             Sign In
           </Button>
         </form>
-
-        <Typography variant="body2" sx={{ mt: 3 }}>
-          Don’t have an account?{" "}
-          <Typography
-            component="span"
-            color="primary"
-            sx={{ cursor: "pointer", fontWeight: 600 }}
-            onClick={() => (window.location.href = "/register")}
-          >
-            Sign up
-          </Typography>
-        </Typography>
       </Paper>
     </Container>
   );

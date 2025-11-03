@@ -16,6 +16,8 @@
     "@mui/material": "^7.3.4",
     "@mui/material-nextjs": "^7.3.3",
     "@mui/x-data-grid": "^8.16.0",
+    "@mui/x-date-pickers": "^8.16.0",
+    "dayjs": "^1.11.19",
     "formik": "^2.4.6",
     "next": "16.0.1",
     "react": "19.2.0",

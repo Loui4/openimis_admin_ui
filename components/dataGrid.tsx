@@ -1,9 +1,8 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { FC } from "react";
 
-
 interface Props {
-  rows:any;
+  rows: any;
   columns: GridColDef[];
   rowIdField?: string; // optional, defaults to 'ProductCode'
 }
