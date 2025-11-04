@@ -35,3 +35,11 @@ export interface MedicalService {
   ServCategory?: string;
   LegacyID?: number;
 }
+
+export interface UploadResponse {
+    inserted:number;
+    updated:number;
+    skipped:number;
+    errorCount:number;
+    errors:Array<{code:number; friendlyMessage:string, detailedError:string}>
+}
