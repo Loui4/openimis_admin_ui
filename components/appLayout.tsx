@@ -135,7 +135,7 @@ export default function AppLayout({ children }: Props) {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            openIMIS Admin
+            OpenIMIS Admin
           </Typography>
 
           {/* User Avatar + Name + Menu */}

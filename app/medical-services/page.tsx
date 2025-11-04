@@ -1,6 +1,17 @@
 import { getMedicalServices } from "@/services/medicalService";
 import { MedicalServiceList } from "./components/medicalServiceList";
+import { Box } from "@mui/material";
+import { ImportButtonDialog } from "./components/importDialog";
 
 export default async function Page() {
-    return <MedicalServiceList medicalServiceList={await getMedicalServices()} />
+  const medicalServiceList = await getMedicalServices();
+
+  return (
+    <Box sx={{ p: 3 }}>
+      {/* Client-side import button */}
+      <ImportButtonDialog />
+
+      <MedicalServiceList medicalServiceList={medicalServiceList} />
+    </Box>
+  );
 }

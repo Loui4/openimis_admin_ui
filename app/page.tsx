@@ -10,6 +10,7 @@ import {
   TextField,
   Typography,
   Paper,
+  Tooltip,
 } from "@mui/material";
 import { Visibility, VisibilityOff, LockOutlined } from "@mui/icons-material";
 import Image from "next/image";
@@ -21,14 +22,15 @@ export default function LoginPage() {
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Login submitted:", form);
     router.push("/products");
-    // TODO: handle authentication logic (e.g., call API)
+    // TODO: Replace console.log with authentication logic (API call)
   };
 
   return (
@@ -42,28 +44,38 @@ export default function LoginPage() {
       }}
     >
       <Paper
-        elevation={6}
+        elevation={8}
         sx={{
           p: 5,
           borderRadius: 4,
           width: "100%",
           textAlign: "center",
+          backdropFilter: "blur(6px)",
         }}
       >
+        {/* Logo Section */}
         <Box sx={{ mb: 3 }}>
           <Image
-            src="/logo.png" // Path in your /public folder
-            alt="logo"
-            width={100}
-            height={100}
+            src="/logo.png"
+            alt="App logo"
+            width={90}
+            height={90}
+            style={{ borderRadius: "12px" }}
           />
-
-          <Typography variant="h5" fontWeight={600} sx={{ mt: 2 }}>
-            SLA
+          <Typography
+            variant="h5"
+            fontWeight={600}
+            sx={{ mt: 2, letterSpacing: 0.5 }}
+          >
+            SLA Admin Portal
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+            Please sign in to continue
           </Typography>
         </Box>
 
-        <form onSubmit={handleSubmit}>
+        {/* Form Section */}
+        <Box component="form" onSubmit={handleSubmit} noValidate>
           <TextField
             fullWidth
             label="Email Address"
@@ -73,7 +85,11 @@ export default function LoginPage() {
             margin="normal"
             variant="outlined"
             required
+            type="email"
+            autoComplete="email"
+            autoFocus
           />
+
           <TextField
             fullWidth
             label="Password"
@@ -84,32 +100,60 @@ export default function LoginPage() {
             margin="normal"
             variant="outlined"
             required
+            autoComplete="current-password"
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
+                  <Tooltip
+                    title={showPassword ? "Hide Password" : "Show Password"}
+                  >
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </Tooltip>
                 </InputAdornment>
               ),
             }}
           />
+
           <Button
             fullWidth
             type="submit"
             variant="contained"
             size="large"
+            startIcon={<LockOutlined />}
             sx={{
               mt: 3,
-              py: 1.2,
+              py: 1.4,
               borderRadius: 2,
               textTransform: "none",
               fontSize: "1rem",
+              fontWeight: 600,
+              boxShadow: 3,
             }}
           >
             Sign In
           </Button>
-        </form>
+
+          {/* <Typography variant="body2" sx={{ mt: 2 }} color="text.secondary">
+            Forgot your password?{" "}
+            <Typography
+              component="span"
+              color="primary"
+              sx={{
+                cursor: "pointer",
+                fontWeight: 500,
+                "&:hover": { textDecoration: "underline" },
+              }}
+            >
+              Reset it here
+            </Typography>
+          </Typography> */}
+        </Box>
       </Paper>
     </Container>
   );

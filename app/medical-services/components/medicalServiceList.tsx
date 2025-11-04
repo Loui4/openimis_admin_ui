@@ -11,18 +11,18 @@ export const columns: GridColDef[] = [
   { field: "ServLevel", headerName: "Level" },
   { field: "ServPrice", headerName: "Price (MWK)", flex: 1, type: "number" },
   { field: "ServCareType", headerName: "Care Type" },
-  { field: "ServFrequency", headerName: "Frequency", flex: 1, type: "number" },
-  { field: "ServPatCat", headerName: "Patient Category", flex: 1 },
+  // { field: "ServFrequency", headerName: "Frequency", flex: 1, type: "number" },
+  // { field: "ServPatCat", headerName: "Patient Category", flex: 1 },
   {
     field: "ValidityFrom",
     headerName: "Validity From",
     flex: 1,
   },
-  {
-    field: "ValidityTo",
-    headerName: "Validity To",
-    flex: 1,
-  },
+  // {
+  //   field: "ValidityTo",
+  //   headerName: "Validity To",
+  //   flex: 1,
+  // },
   // { field: "MaximumAmount", headerName: "Max Amount", flex: 1, type: "number" },
   // {
   //   field: "manualPrice",
