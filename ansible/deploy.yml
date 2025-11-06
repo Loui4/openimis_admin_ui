@@ -2,6 +2,9 @@
 - hosts: all
   become: yes
   tasks:
+    - name: Mark git repo as safe
+      command: git config --global --add safe.directory /var/www/openimis-admin-portal/openimis_admin_ui
+      
     - name: Pull latest code
       git:
         repo: "git@github.com:Loui4/openimis_admin_ui.git"
