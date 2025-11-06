@@ -1,4 +1,7 @@
 "use client";
+import Link from "next/link";
+import { Button, Stack } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import { DataGridComponent } from "@/components/dataGrid";
 import { PriceList } from "@/interface";
 import { GridColDef } from "@mui/x-data-grid";
@@ -56,52 +59,73 @@ export const PriceListList: FC<{ priceLists: PriceList[] }> = ({
   ];
 
   return (
-    <div style={{ height: 400, width: "100%" }}>
-      <DataGridComponent
-        rows={priceLists}
-        columns={columns}
-        rowIdField="PLServiceID"
-      />
-
-      {/* Dropdown menu */}
-      <Menu
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleMenuClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
+    <Stack spacing={2}>
+      <Button
+        component={Link}
+        href="/price-lists/create"
+        variant="outlined"
+        color="primary"
+        startIcon={<AddIcon />}
+        sx={{
+          alignSelf: "flex-start",
+          borderRadius: 2,
+          textTransform: "none",
+          fontWeight: 500,
+          boxShadow: 2,
+          "&:hover": {
+            boxShadow: 4,
+          },
         }}
       >
-        <MenuItem
-          onClick={() =>
-            router.push(`/price-lists/${selectedRow?.PLServiceID}/view`)
-          }
+        Create Price List
+      </Button>
+      <div style={{ height: 400, width: "100%" }}>
+        <DataGridComponent
+          rows={priceLists}
+          columns={columns}
+          rowIdField="PLServiceID"
+        />
+
+        {/* Dropdown menu */}
+        <Menu
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleMenuClose}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
         >
-          View
-        </MenuItem>
-        <MenuItem
-          onClick={() =>
-            router.push(`/price-lists/${selectedRow?.PLServiceID}/edit`)
-          }
-        >
-          Edit
-        </MenuItem>
-        <MenuItem
-          onClick={() =>
-            router.push(
-              `/price-lists/${selectedRow?.PLServiceID}/attach-services`
-            )
-          }
-        >
-          Attach Services
-        </MenuItem>
-        <MenuItem onClick={() => router.push("/view")}>Delete</MenuItem>
-      </Menu>
-    </div>
+          <MenuItem
+            onClick={() =>
+              router.push(`/price-lists/${selectedRow?.PLServiceID}/view`)
+            }
+          >
+            View
+          </MenuItem>
+          <MenuItem
+            onClick={() =>
+              router.push(`/price-lists/${selectedRow?.PLServiceID}/edit`)
+            }
+          >
+            Edit
+          </MenuItem>
+          <MenuItem
+            onClick={() =>
+              router.push(
+                `/price-lists/${selectedRow?.PLServiceID}/attach-services`
+              )
+            }
+          >
+            Attach Services
+          </MenuItem>
+          <MenuItem onClick={() => router.push("/view")}>Delete</MenuItem>
+        </Menu>
+      </div>
+    </Stack>
   );
 };
