@@ -6,6 +6,7 @@ import AddIcon from "@mui/icons-material/Add";
 export default async function Page() {
   return (
     <Stack spacing={2}>
+      <h2>Price lists</h2>
       <Button
         variant="outlined"
         color="primary"

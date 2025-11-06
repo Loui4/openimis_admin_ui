@@ -1,9 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
-import { Roboto } from "next/font/google";
-import { ThemeProvider, CssBaseline } from "@mui/material";
+import {
+  ThemeProvider,
+  CssBaseline,
+  Box,
+  CircularProgress,
+} from "@mui/material";
 import theme from "../theme";
 import { usePathname, useRouter } from "next/navigation";
 import AppLayout from "../components/appLayout";
@@ -18,23 +22,37 @@ export default function RootClientLayout({
   const router = useRouter();
   const pathname = usePathname();
   const isAuthPage = pathname === "/";
-  // ⚡ Run redirect in useEffect instead of render
+
   useEffect(() => {
     if (!user && !isAuthPage) {
       router.push("/");
     }
   }, [user, isAuthPage, router]);
 
-  // You can render a placeholder while redirecting
-  if (!user && !isAuthPage) {
-    return <div>Redirecting...</div>;
-  }
+  if (!user && !isAuthPage) return <div>Redirecting...</div>;
+
+  const loader = (
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      height="100vh"
+    >
+      <CircularProgress />
+    </Box>
+  );
 
   return (
     <AppRouterCacheProvider>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        {isAuthPage ? children : <AppLayout user={user}>{children}</AppLayout>}
+        <Suspense fallback={loader}>
+          {isAuthPage ? (
+            children
+          ) : (
+            <AppLayout user={user}>{children}</AppLayout>
+          )}
+        </Suspense>
       </ThemeProvider>
     </AppRouterCacheProvider>
   );

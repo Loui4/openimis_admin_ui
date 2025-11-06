@@ -24,10 +24,9 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
-import LocalPharmacyIcon from "@mui/icons-material/LocalPharmacy";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import { logoutService } from "@/lib/apiService";
 
@@ -40,7 +39,6 @@ interface Props {
 
 // Replace this with your real auth/user state
 const currentUser = {
-  name: "Louis Nyirongo",
   avatarUrl: "/avatar.png", // replace with real avatar URL
 };
 
@@ -48,6 +46,7 @@ export default function AppLayout({ children, user }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const router = useRouter();
+  const pathname = usePathname(); // current path
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -62,11 +61,19 @@ export default function AppLayout({ children, user }: Props) {
   };
 
   const handleLogout = async () => {
-    console.log("Logout clicked");
-    // Add your logout logic here (clear token, call API, etc.)
     await logoutService();
     router.push("/"); // redirect to login page
   };
+
+  const menuItems = [
+    { text: "Products", icon: <Inventory2Icon />, href: "/products" },
+    { text: "Price Lists", icon: <AttachMoneyIcon />, href: "/price-lists" },
+    {
+      text: "Medical Services",
+      icon: <MedicalServicesIcon />,
+      href: "/medical-services",
+    },
+  ];
 
   const drawer = (
     <div>
@@ -78,40 +85,38 @@ export default function AppLayout({ children, user }: Props) {
           py: "2ch",
         }}
       >
-        <Image
-          src="/logo.png" // Path in your /public folder
-          alt="logo"
-          width={70}
-          height={70}
-        />
+        <Image src="/logo.png" alt="logo" width={70} height={70} />
       </Toolbar>
       <Divider />
       <List>
-        {[
-          { text: "Products", icon: <Inventory2Icon />, href: "/products" },
-          {
-            text: "Price Lists",
-            icon: <AttachMoneyIcon />,
-            href: "/price-lists",
-          },
-          {
-            text: "Medical Services",
-            icon: <MedicalServicesIcon />,
-            href: "/medical-services",
-          },
-          {
-            text: "Medical Items",
-            icon: <LocalPharmacyIcon />,
-            href: "/medical-items",
-          },
-        ].map(({ text, icon, href }) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton component={Link} href={href}>
-              <ListItemIcon>{icon}</ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
+        {menuItems.map(({ text, icon, href }) => {
+          const isActive = pathname.startsWith(href); // highlight if current path matches
+          return (
+            <ListItem key={text} disablePadding>
+              <ListItemButton
+                component={Link}
+                href={href}
+                sx={{
+                  backgroundColor: isActive
+                    ? "rgba(0, 98, 115, 0.1)"
+                    : "inherit",
+                  "&:hover": { backgroundColor: "rgba(0, 98, 115, 0.15)" },
+                }}
+              >
+                <ListItemIcon sx={{ color: isActive ? "#006273" : "inherit" }}>
+                  {icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={text}
+                  sx={{
+                    color: isActive ? "#006273" : "inherit",
+                    fontWeight: isActive ? "bold" : "normal",
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          );
+        })}
       </List>
     </div>
   );

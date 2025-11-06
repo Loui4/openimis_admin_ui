@@ -7,7 +7,8 @@ export default async function Page() {
   const medicalServiceList = await getMedicalServices();
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box>
+      <h2>Medical Services</h2>
       {/* Client-side import button */}
       <ImportButtonDialog />
 

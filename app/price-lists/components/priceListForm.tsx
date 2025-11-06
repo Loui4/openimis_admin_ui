@@ -37,7 +37,7 @@ export const PriceListForm: FC<Props> = ({ onSubmit }) => {
     <FormikInit
       validationSchema={schema}
       onSubmit={onSubmit}
-      initialValues={{ PLServName: "", DatePL: "", ValidityFrom: "" }}
+      initialValues={{ PLServName: "" }}
     >
       <TextInputField
         name={form.PLServName.name}
