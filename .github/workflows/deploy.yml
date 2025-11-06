@@ -25,6 +25,6 @@ jobs:
 
             - name: Run Ansible Playbook
               run: |
-                  ansible-playbook -i "${{ secrets.SERVER_IP }}," deploy.yml \
+                  ansible-playbook -i "${{ secrets.SERVER_IP }}," ansible/deploy.yml \
                     -u ${{ secrets.SERVER_USER }} \
                     --private-key ~/.ssh/id_ed25519
