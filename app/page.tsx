@@ -53,7 +53,7 @@ export default function LoginPage() {
         sx={{
           p: 5,
           borderRadius: 4,
-          width: "100%",
+          width: "80%",
           textAlign: "center",
           backdropFilter: "blur(6px)",
         }}

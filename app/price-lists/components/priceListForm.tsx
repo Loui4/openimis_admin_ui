@@ -22,10 +22,10 @@ const form = {
 
 const schema = Yup.object().shape({
   [form.PLServName.name]: Yup.string().required().label(form.PLServName.label),
-  [form.DatePL.name]: Yup.date().required().label(form.DatePL.label),
-  [form.ValidityFrom.name]: Yup.date()
-    .required()
-    .label(form.ValidityFrom.label),
+  // [form.DatePL.name]: Yup.date().required().label(form.DatePL.label),
+  // [form.ValidityFrom.name]: Yup.date()
+  //   .required()
+  //   .label(form.ValidityFrom.label),
 });
 
 interface Props {
@@ -44,11 +44,11 @@ export const PriceListForm: FC<Props> = ({ onSubmit }) => {
         label={form.PLServName.label}
         id={form.PLServName.name}
       />
-      <FormDatePicker name={form.DatePL.name} label={form.DatePL.label} />
+      {/* <FormDatePicker name={form.DatePL.name} label={form.DatePL.label} />
       <FormDatePicker
         name={form.ValidityFrom.name}
         label={form.ValidityFrom.label}
-      />
+      /> */}
     </FormikInit>
   );
 };
