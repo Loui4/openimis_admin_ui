@@ -39,6 +39,7 @@ jobs:
 
       # 5️⃣ Install dependencies
       - name: Install dependencies
+        working-directory: ${{ github.workspace }}
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
