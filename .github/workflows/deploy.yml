@@ -49,7 +49,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install ansible==8.10.0
+          pip install ansible
 
       # 7️⃣ Run Ansible playbook
       - name: Run Ansible Playbook
