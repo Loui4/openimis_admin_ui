@@ -29,11 +29,13 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { logoutService } from "@/lib/apiService";
 
 const drawerWidth = 240;
 
 interface Props {
   children: React.ReactNode;
+  user: { userId: string; username: string } | null;
 }
 
 // Replace this with your real auth/user state
@@ -42,7 +44,7 @@ const currentUser = {
   avatarUrl: "/avatar.png", // replace with real avatar URL
 };
 
-export default function AppLayout({ children }: Props) {
+export default function AppLayout({ children, user }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const router = useRouter();
@@ -59,10 +61,11 @@ export default function AppLayout({ children }: Props) {
     setAnchorElUser(null);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     console.log("Logout clicked");
     // Add your logout logic here (clear token, call API, etc.)
-    router.push("/login"); // redirect to login page
+    await logoutService();
+    router.push("/"); // redirect to login page
   };
 
   const drawer = (
@@ -140,10 +143,10 @@ export default function AppLayout({ children }: Props) {
 
           {/* User Avatar + Name + Menu */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Typography variant="body1">{currentUser.name}</Typography>
+            <Typography variant="body1">{user?.username}</Typography>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt={currentUser.name} src={currentUser.avatarUrl} />
+                <Avatar alt={user?.username} src={currentUser.avatarUrl} />
               </IconButton>
             </Tooltip>
             <Menu

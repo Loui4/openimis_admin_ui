@@ -1,8 +1,10 @@
+"use client";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { FC } from "react";
+import { FC, useState, useMemo } from "react";
+import { TextField, Box } from "@mui/material";
 
 interface Props {
-  rows: any;
+  rows: any[];
   columns: GridColDef[];
   rowIdField?: string; // optional, defaults to 'ProductCode'
 }
@@ -12,12 +14,38 @@ export const DataGridComponent: FC<Props> = ({
   columns,
   rowIdField = "ProductCode",
 }) => {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // filter rows by search term across all fields
+  const filteredRows = useMemo(() => {
+    if (!searchQuery) return rows;
+
+    const lowerQuery = searchQuery.toLowerCase();
+
+    return rows.filter((row) =>
+      Object.values(row).some((value) =>
+        String(value).toLowerCase().includes(lowerQuery)
+      )
+    );
+  }, [rows, searchQuery]);
+
   return (
-    <div style={{ height: 500, width: "100%" }}>
+    <Box sx={{ height: 600, width: "100%" }}>
+      {/* 🔍 Search Bar */}
+      <TextField
+        variant="outlined"
+        size="small"
+        placeholder="Search..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        sx={{ mb: 2, width: "40%" }}
+      />
+
+      {/* 🧾 DataGrid */}
       <DataGrid
-        rows={rows}
+        rows={filteredRows}
         columns={columns}
-        getRowId={(row) => row[rowIdField]} // use the unique field for row id
+        getRowId={(row) => row[rowIdField]}
         pageSizeOptions={[10, 25, 50]}
         initialState={{
           pagination: { paginationModel: { pageSize: 10, page: 0 } },
@@ -42,14 +70,11 @@ export const DataGridComponent: FC<Props> = ({
           "& .MuiDataGrid-footerContainer": {
             borderTop: "none",
           },
-          "& .MuiDataGrid-columnSeparator": {
-            display: "none",
-          },
-          "& .MuiDataGrid-iconSeparator": {
+          "& .MuiDataGrid-columnSeparator, & .MuiDataGrid-iconSeparator": {
             display: "none",
           },
         }}
       />
-    </div>
+    </Box>
   );
 };

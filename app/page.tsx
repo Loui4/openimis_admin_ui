@@ -15,6 +15,7 @@ import {
 import { Visibility, VisibilityOff, LockOutlined } from "@mui/icons-material";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { loginService } from "@/lib/apiService";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -26,10 +27,14 @@ export default function LoginPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login submitted:", form);
-    router.push("/products");
+
+    try {
+      const response = await loginService(form.email, form.password);
+      router.push("/products");
+    } catch (error: unknown) {}
+
     // TODO: Replace console.log with authentication logic (API call)
   };
 

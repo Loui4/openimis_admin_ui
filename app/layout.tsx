@@ -1,11 +1,7 @@
-"use client";
+// app/layout.tsx
+import RootClientLayout from "./rootClientLayout";
 
-import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import { Roboto } from "next/font/google";
-import { ThemeProvider, CssBaseline, Box } from "@mui/material";
-import theme from "../theme";
-import { usePathname } from "next/navigation";
-import AppLayout from "../components/appLayout";
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700"],
@@ -14,25 +10,34 @@ const roboto = Roboto({
   variable: "--font-roboto",
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
+  // Server-side: check cookie / auth
+  let currentUser = null;
 
-  // Paths that should NOT display the AppBar/Drawer
-  const isAuthPage = pathname === "/";
+  try {
+    const { cookies } = await import("next/headers"); // only server-side
+    const cookieStore = await cookies();
+    const token = cookieStore.get("auth_token")?.value;
+
+    if (token) {
+      const { apiService } = await import("@/lib/apiService");
+      currentUser = await apiService("users/me/profile", {
+        method: "GET",
+        withAuth: true,
+      });
+    }
+  } catch (err) {
+    currentUser = null;
+  }
 
   return (
     <html lang="en" className={roboto.variable}>
       <body>
-        <AppRouterCacheProvider>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            {isAuthPage ? children : <AppLayout>{children}</AppLayout>}
-          </ThemeProvider>
-        </AppRouterCacheProvider>
+        <RootClientLayout user={currentUser}>{children}</RootClientLayout>
       </body>
     </html>
   );
