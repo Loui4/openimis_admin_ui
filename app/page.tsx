@@ -11,6 +11,7 @@ import {
   Typography,
   Paper,
   Tooltip,
+  Alert,
 } from "@mui/material";
 import { Visibility, VisibilityOff, LockOutlined } from "@mui/icons-material";
 import Image from "next/image";
@@ -21,6 +22,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -29,13 +31,14 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
 
     try {
       const response = await loginService(form.email, form.password);
       router.push("/products");
-    } catch (error: unknown) {}
-
-    // TODO: Replace console.log with authentication logic (API call)
+    } catch (err) {
+      setError("Login failed. Please check your credentials.");
+    }
   };
 
   return (
@@ -78,6 +81,20 @@ export default function LoginPage() {
             Please sign in to continue
           </Typography>
         </Box>
+
+        {/* Error Message */}
+        {error && (
+          <Alert
+            severity="error"
+            sx={{
+              mb: 2,
+              textAlign: "left",
+              fontSize: "0.95rem",
+            }}
+          >
+            {error}
+          </Alert>
+        )}
 
         {/* Form Section */}
         <Box component="form" onSubmit={handleSubmit} noValidate>
@@ -143,21 +160,6 @@ export default function LoginPage() {
           >
             Sign In
           </Button>
-
-          {/* <Typography variant="body2" sx={{ mt: 2 }} color="text.secondary">
-            Forgot your password?{" "}
-            <Typography
-              component="span"
-              color="primary"
-              sx={{
-                cursor: "pointer",
-                fontWeight: 500,
-                "&:hover": { textDecoration: "underline" },
-              }}
-            >
-              Reset it here
-            </Typography>
-          </Typography> */}
         </Box>
       </Paper>
     </Container>

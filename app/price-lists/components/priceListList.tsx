@@ -77,8 +77,20 @@ export const PriceListList: FC<{ priceLists: PriceList[] }> = ({
           horizontal: "right",
         }}
       >
-        <MenuItem onClick={() => router.push("/view")}>View</MenuItem>
-        <MenuItem onClick={() => router.push("/edit")}>Edit</MenuItem>
+        <MenuItem
+          onClick={() =>
+            router.push(`/price-lists/${selectedRow?.PLServiceID}/view`)
+          }
+        >
+          View
+        </MenuItem>
+        <MenuItem
+          onClick={() =>
+            router.push(`/price-lists/${selectedRow?.PLServiceID}/edit`)
+          }
+        >
+          Edit
+        </MenuItem>
         <MenuItem
           onClick={() =>
             router.push(
