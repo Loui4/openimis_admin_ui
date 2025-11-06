@@ -24,7 +24,7 @@
       become: no  # run as deploy user
 
     - name: Install dependencies
-      command: npm install
+      command: npm install --legacy-peer-deps
       args:
         chdir: /var/www/openmis-admin-portal/openimis_admin_ui
       become: no
