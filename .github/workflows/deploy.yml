@@ -9,6 +9,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+
     steps:
       # 1️⃣ Checkout the repository
       - name: Checkout repository
@@ -37,13 +41,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      # 5️⃣ Install dependencies
+      # 5️⃣ Verify requirements.txt exists
+      - name: List repo files
+        run: ls -l
+
+      # 6️⃣ Install dependencies
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install -r ${{ github.workspace }}/requirements.txt
+          pip install -r requirements.txt
 
-      # 6️⃣ Run Ansible playbook
+      # 7️⃣ Run Ansible playbook
       - name: Run Ansible Playbook
         run: |
           ansible-playbook -i "${{ secrets.SERVER_IP }}," ansible/deploy.yml \
