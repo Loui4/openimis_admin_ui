@@ -2,27 +2,44 @@
 - hosts: all
   become: yes
   tasks:
+    - name: Ensure GitHub is in known_hosts
+      ansible.builtin.known_hosts:
+        path: /home/deploy/.ssh/known_hosts   # replace 'deploy' with your user
+        name: github.com
+        key: "{{ lookup('pipe','ssh-keyscan github.com') }}"
+        state: present
+
     - name: Mark git repo as safe
       command: git config --global --add safe.directory /var/www/openmis-admin-portal/openimis_admin_ui
+      become: no  # run as deploy user
 
     - name: Pull latest code
       git:
         repo: "git@github.com:Loui4/openimis_admin_ui.git"
         dest: /var/www/openmis-admin-portal/openimis_admin_ui
         version: main
+        force: yes
+        update: yes
+        accept_hostkey: yes
+      become: no  # run as deploy user
 
     - name: Install dependencies
       command: npm install
       args:
-        chdir: var/www/openmis-admin-portal/openimis_admin_ui
+        chdir: /var/www/openmis-admin-portal/openimis_admin_ui
+      become: no
+
     - name: Build app
       command: npm run build
       args:
-        chdir: var/www/openmis-admin-portal/openimis_admin_ui
+        chdir: /var/www/openmis-admin-portal/openimis_admin_ui
+      become: no
 
-    - name: stop pm2 processes
+    - name: Stop pm2 processes
       command: pm2 delete openimis-ui
-    
-    - name: start pm2 processes
+      ignore_errors: yes
+      become: no
+
+    - name: Start pm2 processes
       command: PORT=3000 pm2 start npm --name "openimis-ui" -- start
-    
+      become: no
