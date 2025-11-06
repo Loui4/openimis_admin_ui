@@ -12,6 +12,7 @@ import {
   Paper,
   Tooltip,
   Alert,
+  CircularProgress,
 } from "@mui/material";
 import { Visibility, VisibilityOff, LockOutlined } from "@mui/icons-material";
 import Image from "next/image";
@@ -21,8 +22,9 @@ import { loginService } from "@/lib/apiService";
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
-  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -32,12 +34,15 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setIsLoading(true);
 
     try {
-      const response = await loginService(form.email, form.password);
+      await loginService(form.email, form.password);
       router.push("/products");
     } catch (err) {
       setError("Login failed. Please check your credentials.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -64,7 +69,7 @@ export default function LoginPage() {
         {/* Logo Section */}
         <Box sx={{ mb: 3 }}>
           <Image
-            src="/logo.png"
+            src="/admin-portal/logo.png"
             alt="App logo"
             width={90}
             height={90}
@@ -147,7 +152,8 @@ export default function LoginPage() {
             type="submit"
             variant="contained"
             size="large"
-            startIcon={<LockOutlined />}
+            startIcon={!isLoading && <LockOutlined />}
+            disabled={isLoading}
             sx={{
               mt: 3,
               py: 1.4,
@@ -158,7 +164,11 @@ export default function LoginPage() {
               boxShadow: 3,
             }}
           >
-            Sign In
+            {isLoading ? (
+              <CircularProgress size={26} color="inherit" />
+            ) : (
+              "Sign In"
+            )}
           </Button>
         </Box>
       </Paper>

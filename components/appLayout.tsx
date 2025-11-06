@@ -85,7 +85,7 @@ export default function AppLayout({ children, user }: Props) {
           py: "2ch",
         }}
       >
-        <Image src="/logo.png" alt="logo" width={70} height={70} />
+        <Image src="/admin-portal/logo.png" alt="logo" width={70} height={70} />
       </Toolbar>
       <Divider />
       <List>
