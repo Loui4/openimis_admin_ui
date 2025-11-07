@@ -80,7 +80,7 @@ export default function LoginPage() {
             fontWeight={600}
             sx={{ mt: 2, letterSpacing: 0.5 }}
           >
-            SLA Admin Portal+shammy
+            SLA Admin Portal
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
             Please sign in to continue
