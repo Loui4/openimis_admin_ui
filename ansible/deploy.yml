@@ -42,4 +42,6 @@
 
     - name: Start pm2 processes
       command: PORT=3000 pm2 start npm --name "openimis-ui" -- start
+      args:
+        chdir: /var/www/openmis-admin-portal/openimis_admin_ui
       become: no
