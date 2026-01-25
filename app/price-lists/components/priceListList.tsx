@@ -5,7 +5,11 @@ import { Button, Stack } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { DataGridComponent } from "@/components/dataGrid";
 import { PriceList } from "@/interface";
-import { GridColDef } from "@mui/x-data-grid";
+import {
+  GridColDef,
+  GridValueFormatter,
+  GridValueGetter,
+} from "@mui/x-data-grid";
 import { FC, useMemo, useState } from "react";
 import {
   IconButton,
@@ -47,7 +51,6 @@ export const PriceListList: FC<{ priceLists: PriceList[] }> = ({
   };
 
   const handleOpenDeleteConfirm = () => {
-    // keep selectedRow, but close the menu
     setAnchorEl(null);
     setConfirmOpen(true);
   };
@@ -65,24 +68,67 @@ export const PriceListList: FC<{ priceLists: PriceList[] }> = ({
 
       setConfirmOpen(false);
       setSelectedRow(null);
-
-      // refresh server data (App Router)
       router.refresh();
     } catch (e) {
       console.error(e);
-      // You can replace this with your toast/snackbar
       alert("Failed to delete price list. Please try again.");
     } finally {
       setDeleting(false);
     }
   };
 
+  // Convert incoming value (string/date/whatever) -> Date | null safely
+  const toDateOrNull = (value: unknown): Date | null => {
+    if (!value) return null;
+
+    // If it's already a Date-like object with getTime (avoid instanceof)
+    if (typeof value === "object" && value !== null && "getTime" in value) {
+      const t = (value as { getTime: () => number }).getTime();
+      return Number.isFinite(t) ? (value as Date) : null;
+    }
+
+    // If it's a string or number, try parsing
+    const t = Date.parse(String(value));
+    if (!Number.isFinite(t)) return null;
+
+    const d = new Date(t);
+    return Number.isNaN(d.getTime()) ? null : d;
+  };
+
+  const dateValueGetter: GridValueGetter = (value) => {
+    return toDateOrNull(value);
+  };
+
+  const dateValueFormatter: GridValueFormatter = (value) => {
+    const d = value as Date | null;
+    if (!d) return "";
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }).format(d); // e.g. 25 Jan 2026
+  };
+
   const columns: GridColDef[] = useMemo(
     () => [
       { field: "PLServiceID", headerName: "Service ID", flex: 1 },
       { field: "PLServName", headerName: "Service Name", flex: 2 },
-      { field: "DatePL", headerName: "Price List Date", flex: 1 },
+
+      {
+        field: "DatePL",
+        headerName: "Price List Date",
+        flex: 1,
+        valueGetter: dateValueGetter,
+        valueFormatter: dateValueFormatter,
+        sortComparator: (v1, v2) => {
+          const t1 = (v1 as Date | null)?.getTime?.() ?? 0;
+          const t2 = (v2 as Date | null)?.getTime?.() ?? 0;
+          return t1 - t2;
+        },
+      },
+
       { field: "NumberOfServices", headerName: "Number of Services", flex: 1 },
+
       {
         field: "actions",
         headerName: "",
@@ -90,7 +136,7 @@ export const PriceListList: FC<{ priceLists: PriceList[] }> = ({
         flex: 0.5,
         renderCell: (params) => (
           <IconButton
-            onClick={(e) => handleMenuOpen(e, params.row)}
+            onClick={(e) => handleMenuOpen(e, params.row as PriceList)}
             size="small"
           >
             <MoreVertIcon />
@@ -128,7 +174,6 @@ export const PriceListList: FC<{ priceLists: PriceList[] }> = ({
           rowIdField="PLServiceID"
         />
 
-        {/* Dropdown menu */}
         <Menu
           anchorEl={anchorEl}
           open={open}
@@ -172,7 +217,6 @@ export const PriceListList: FC<{ priceLists: PriceList[] }> = ({
         </Menu>
       </div>
 
-      {/* Confirm delete dialog */}
       <Dialog
         open={confirmOpen}
         onClose={deleting ? undefined : handleCloseDeleteConfirm}
@@ -180,8 +224,8 @@ export const PriceListList: FC<{ priceLists: PriceList[] }> = ({
         <DialogTitle>Delete price list?</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            are you sure you want to delete{" "}
-            <strong> {selectedRow?.PLServName ?? "this price list"}</strong>
+            Are you sure you want to delete{" "}
+            <strong>{selectedRow?.PLServName ?? "this price list"}</strong>?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
