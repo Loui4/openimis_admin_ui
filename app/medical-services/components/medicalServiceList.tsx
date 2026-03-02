@@ -1,8 +1,40 @@
 "use client";
 import { DataGridComponent } from "@/components/dataGrid";
-import { MedicalService, PriceList, Product } from "@/interface";
+import { MedicalService } from "@/interface";
 import { GridColDef } from "@mui/x-data-grid";
 import { FC } from "react";
+
+const readableDateFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "long",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+const formatReadableDate = (value: unknown) => {
+  if (!value) {
+    return "";
+  }
+
+  if (typeof value === "string") {
+    const isoDateMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+    if (isoDateMatch) {
+      const [, year, month, day] = isoDateMatch;
+      return readableDateFormatter.format(
+        new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)))
+      );
+    }
+  }
+
+  const parsedDate = new Date(String(value));
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return String(value);
+  }
+
+  return readableDateFormatter.format(parsedDate);
+};
 
 export const columns: GridColDef[] = [
   { field: "ServCode", headerName: "Service Code", flex: 1 },
@@ -17,6 +49,7 @@ export const columns: GridColDef[] = [
     field: "ValidityFrom",
     headerName: "Validity From",
     flex: 1,
+    valueFormatter: (value) => formatReadableDate(value),
   },
   // {
   //   field: "ValidityTo",
