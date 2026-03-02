@@ -77,7 +77,6 @@ export function ImportButtonDialog() {
       <Button
         variant="outlined"
         startIcon={<CloudUploadIcon />}
-        sx={{ mb: 2 }}
         onClick={handleOpen}
       >
         Import Medical Services
