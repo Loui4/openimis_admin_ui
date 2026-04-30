@@ -9,19 +9,38 @@ export const MedicalServiceNotification = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const isCreated = searchParams.get("created") === "1";
-  const [open, setOpen] = useState(isCreated);
+  const isPriceUpdated = searchParams.get("priceUpdated") === "1";
+  const [message, setMessage] = useState("");
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    setOpen(isCreated);
-  }, [isCreated]);
+    if (isCreated) {
+      setMessage("Medical service created successfully.");
+      setOpen(true);
+      return;
+    }
 
-  const clearCreatedParam = () => {
-    if (!isCreated) {
+    if (isPriceUpdated) {
+      setMessage("Medical service price updated successfully.");
+      setOpen(true);
+      return;
+    }
+
+    if (sessionStorage.getItem("medicalServicePriceUpdated") === "1") {
+      sessionStorage.removeItem("medicalServicePriceUpdated");
+      setMessage("Medical service price updated successfully.");
+      setOpen(true);
+    }
+  }, [isCreated, isPriceUpdated]);
+
+  const clearNotificationParams = () => {
+    if (!isCreated && !isPriceUpdated) {
       return;
     }
 
     const nextParams = new URLSearchParams(searchParams.toString());
     nextParams.delete("created");
+    nextParams.delete("priceUpdated");
 
     const nextUrl = nextParams.toString()
       ? `${pathname}?${nextParams.toString()}`
@@ -39,7 +58,7 @@ export const MedicalServiceNotification = () => {
     }
 
     setOpen(false);
-    clearCreatedParam();
+    clearNotificationParams();
   };
 
   return (
@@ -55,7 +74,7 @@ export const MedicalServiceNotification = () => {
         variant="filled"
         sx={{ width: "100%" }}
       >
-        Medical service created successfully.
+        {message}
       </Alert>
     </Snackbar>
   );

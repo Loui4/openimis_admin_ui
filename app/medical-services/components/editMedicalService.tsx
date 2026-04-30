@@ -1,18 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import type { MedicalService } from "@/interface";
+import { updateMedicalService } from "@/services/medicalService";
+import { Button, Stack, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { Button, Stack } from "@mui/material";
-import {
-  createMedicalService,
-} from "@/services/medicalService";
+import { useState } from "react";
 import {
   MedicalServiceForm,
   MedicalServiceFormValues,
 } from "./medicalServiceForm";
-import { toMedicalServicePayload } from "./medicalServicePayload";
+import {
+  toMedicalServiceFormValues,
+  toMedicalServicePayload,
+} from "./medicalServicePayload";
 
-export const CreateMedicalService = () => {
+type Props = {
+  service: MedicalService;
+};
+
+export const EditMedicalService = ({ service }: Props) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -22,13 +28,17 @@ export const CreateMedicalService = () => {
     setSubmitError(null);
 
     try {
-      await createMedicalService(toMedicalServicePayload(values));
-      router.replace("/medical-services?created=1");
+      await updateMedicalService(
+        service.ServiceID,
+        toMedicalServicePayload(values)
+      );
+      router.replace("/medical-services");
+      router.refresh();
     } catch (error) {
       setSubmitError(
         error instanceof Error
           ? error.message
-          : "Failed to create medical service."
+          : "Failed to update medical service."
       );
     } finally {
       setLoading(false);
@@ -37,10 +47,14 @@ export const CreateMedicalService = () => {
 
   return (
     <Stack spacing={2}>
+      <Typography variant="h5">Edit Medical Service</Typography>
       <MedicalServiceForm
+        initialValues={toMedicalServiceFormValues(service)}
         onSubmit={handleSubmit}
         loading={loading}
         submitError={submitError}
+        submitButtonText="Update service"
+        showServicePrice={false}
       />
       <Button
         variant="text"

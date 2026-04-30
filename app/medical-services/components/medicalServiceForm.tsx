@@ -94,7 +94,7 @@ const schema = Yup.object().shape({
   [form.LegacyID.name]: optionalNumber(form.LegacyID.label),
 });
 
-const initialValues: MedicalServiceFormValues = {
+const defaultInitialValues: MedicalServiceFormValues = {
   ServCode: "",
   ServName: "",
   ServType: "O",
@@ -116,20 +116,27 @@ interface Props {
   onSubmit: (values: MedicalServiceFormValues) => void | Promise<void>;
   loading?: boolean;
   submitError?: string | null;
+  initialValues?: MedicalServiceFormValues;
+  submitButtonText?: string;
+  showServicePrice?: boolean;
 }
 
 export const MedicalServiceForm: FC<Props> = ({
   onSubmit,
   loading = false,
   submitError,
+  initialValues = defaultInitialValues,
+  submitButtonText = "Save service",
+  showServicePrice = true,
 }) => {
   return (
     <FormikInit
       validationSchema={schema}
       onSubmit={(values: MedicalServiceFormValues) => onSubmit(values)}
       initialValues={initialValues}
-      submitButtonText="Save service"
+      submitButtonText={submitButtonText}
       loading={loading}
+      enableReinitialize
     >
       {({ values, setFieldValue }) => (
         <Stack spacing={2} sx={{ mt: 1 }}>
@@ -163,12 +170,14 @@ export const MedicalServiceForm: FC<Props> = ({
               name={form.ServLevel.name}
               label={form.ServLevel.label}
             />
-            <TextInputField
-              id={form.ServPrice.name}
-              name={form.ServPrice.name}
-              label={form.ServPrice.label}
-              type="number"
-            />
+            {showServicePrice ? (
+              <TextInputField
+                id={form.ServPrice.name}
+                name={form.ServPrice.name}
+                label={form.ServPrice.label}
+                type="number"
+              />
+            ) : null}
             <TextInputField
               id={form.ServCareType.name}
               name={form.ServCareType.name}

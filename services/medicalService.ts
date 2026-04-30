@@ -8,6 +8,10 @@ export async function getMedicalServices() {
   return apiService<MedicalService[]>("service");
 }
 
+export async function getOneMedicalService(id: number | string) {
+  return apiService<MedicalService>(`service/${id}`);
+}
+
 export type CreateMedicalServicePayload = {
   ServCode: string;
   ServName: string;
@@ -35,6 +39,26 @@ export async function createMedicalService(payload: CreateMedicalServicePayload)
   return apiService<CreateMedicalServiceResponse>("service/medical-service", {
     method: "POST",
     body: JSON.stringify(payload),
+  });
+}
+
+export async function updateMedicalService(
+  id: number | string,
+  payload: CreateMedicalServicePayload
+) {
+  return apiService<MedicalService>(`service/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function updateMedicalServicePrice(
+  id: number | string,
+  ServPrice: number
+) {
+  return apiService<MedicalService>(`service/${id}/price`, {
+    method: "PATCH",
+    body: JSON.stringify({ ServPrice }),
   });
 }
 

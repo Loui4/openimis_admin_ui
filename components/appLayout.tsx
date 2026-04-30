@@ -29,6 +29,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import { logoutService } from "@/lib/apiService";
+import { MedicalServiceNotification } from "@/app/medical-services/components/medicalServiceNotification";
 
 const drawerWidth = 240;
 
@@ -215,6 +216,7 @@ export default function AppLayout({ children, user }: Props) {
           mt: 8,
         }}
       >
+        <MedicalServiceNotification />
         {children}
       </Box>
     </Box>
