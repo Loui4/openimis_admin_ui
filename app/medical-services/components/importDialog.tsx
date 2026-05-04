@@ -11,6 +11,10 @@ import {
   Typography,
   CircularProgress,
 } from "@mui/material";
+import dayjs from "dayjs";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import {
@@ -22,6 +26,7 @@ import { UploadResponse } from "@/interface";
 export function ImportButtonDialog() {
   const [open, setOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [validityFrom, setValidityFrom] = useState("");
   const [importSummary, setImportSummary] = useState<UploadResponse | null>(
     null
   );
@@ -33,6 +38,7 @@ export function ImportButtonDialog() {
   const handleClose = () => {
     setOpen(false);
     setFile(null);
+    setValidityFrom("");
     setImportSummary(null);
     setIsDryRunComplete(false);
     setIsSuccess(false);
@@ -48,7 +54,7 @@ export function ImportButtonDialog() {
     if (!file) return;
     setLoading(true);
     try {
-      const data = await dryRunUploadServices(file);
+      const data = await dryRunUploadServices(file, validityFrom);
       setImportSummary(data);
       setIsDryRunComplete(true);
     } catch (error) {
@@ -62,7 +68,7 @@ export function ImportButtonDialog() {
     if (!file) return;
     setLoading(true);
     try {
-      const result = await confirmUploadServices(file);
+      const result = await confirmUploadServices(file, validityFrom);
       console.log("Confirmed upload:", result);
       setIsSuccess(true);
     } catch (error) {
@@ -100,51 +106,69 @@ export function ImportButtonDialog() {
             )}
 
             {!loading && !isDryRunComplete && !isSuccess && (
-              <Box
-                component="label"
-                htmlFor="file-upload"
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  border: "2px dashed #1976d2",
-                  borderRadius: 2,
-                  py: 6,
-                  cursor: "pointer",
-                  textAlign: "center",
-                  transition: "border-color 0.3s",
-                  "&:hover": {
-                    borderColor: "#115293",
-                    backgroundColor: "#f5f5f5",
-                  },
-                }}
-              >
-                <CloudUploadIcon
-                  sx={{ fontSize: 48, color: "#1976d2", mb: 1 }}
-                />
-                {file ? (
-                  <Typography variant="body1" color="textPrimary">
-                    Selected file: {file.name}
-                  </Typography>
-                ) : (
-                  <>
-                    <Typography variant="body1" color="textSecondary">
-                      Drag & drop a file here, or click to select
+              <>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DateTimePicker
+                    label="Validity From"
+                    value={validityFrom ? dayjs(validityFrom) : null}
+                    onChange={(value) =>
+                      setValidityFrom(value?.isValid() ? value.toISOString() : "")
+                    }
+                    slotProps={{
+                      field: { clearable: true },
+                      textField: {
+                        fullWidth: true,
+                        helperText: "Leave blank to use today's date and time.",
+                      },
+                    }}
+                  />
+                </LocalizationProvider>
+                <Box
+                  component="label"
+                  htmlFor="file-upload"
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "2px dashed #1976d2",
+                    borderRadius: 2,
+                    py: 6,
+                    cursor: "pointer",
+                    textAlign: "center",
+                    transition: "border-color 0.3s",
+                    "&:hover": {
+                      borderColor: "#115293",
+                      backgroundColor: "#f5f5f5",
+                    },
+                  }}
+                >
+                  <CloudUploadIcon
+                    sx={{ fontSize: 48, color: "#1976d2", mb: 1 }}
+                  />
+                  {file ? (
+                    <Typography variant="body1" color="textPrimary">
+                      Selected file: {file.name}
                     </Typography>
-                    <Typography variant="caption" color="textSecondary">
-                      Only CSV files are supported
-                    </Typography>
-                  </>
-                )}
-                <input
-                  id="file-upload"
-                  type="file"
-                  accept=".csv"
-                  onChange={handleFileChange}
-                  hidden
-                />
-              </Box>
+                  ) : (
+                    <>
+                      <Typography variant="body1" color="textSecondary">
+                        Drag & drop a file here, or click to select
+                      </Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        Only CSV files are supported
+                      </Typography>
+                    </>
+                  )}
+                  <input
+                    id="file-upload"
+                    type="file"
+                    accept=".csv"
+                    onChange={handleFileChange}
+                    hidden
+                  />
+                </Box>
+              </>
             )}
 
             {!loading && isDryRunComplete && !isSuccess && importSummary && (

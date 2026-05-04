@@ -62,9 +62,12 @@ export async function updateMedicalServicePrice(
   });
 }
 
-export async function dryRunUploadServices(file: File) {
+export async function dryRunUploadServices(file: File, validityFrom?: string) {
   const formData = new FormData();
   formData.append("file", file);
+  if (validityFrom) {
+    formData.append("validityFrom", validityFrom);
+  }
   return apiService<UploadResponse>("service/dry-upload-csv", {
     method: "POST",
     body: formData,
@@ -72,9 +75,12 @@ export async function dryRunUploadServices(file: File) {
   });
 }
 
-export async function confirmUploadServices(file: File) {
+export async function confirmUploadServices(file: File, validityFrom?: string) {
   const formData = new FormData();
   formData.append("file", file);
+  if (validityFrom) {
+    formData.append("validityFrom", validityFrom);
+  }
   return apiService<UploadResponse>("service/upload-csv", {
     method: "POST",
     body: formData,
