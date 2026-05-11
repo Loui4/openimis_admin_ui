@@ -3,9 +3,39 @@
 import { MedicalService } from "@/interface";
 import { apiService } from "@/lib/apiService";
 import { UploadResponse } from "../interface";
+import { cookies } from "next/headers";
 
 export async function getMedicalServices() {
   return apiService<MedicalService[]>("service");
+}
+
+export async function exportMedicalServicesCsv() {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+  if (!baseUrl) {
+    throw new Error("NEXT_PUBLIC_API_BASE_URL is not configured");
+  }
+
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+  const headers: Record<string, string> = {};
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const res = await fetch(`${baseUrl}/service/export-csv`, {
+    method: "GET",
+    headers,
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Export failed: ${res.status} - ${errorText}`);
+  }
+
+  return res.text();
 }
 
 export async function getOneMedicalService(id: number | string) {

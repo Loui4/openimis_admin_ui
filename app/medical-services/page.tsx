@@ -4,6 +4,7 @@ import { Button, Stack } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import Link from "next/link";
 import { ImportButtonDialog } from "./components/importDialog";
+import { ExportButton } from "./components/exportButton";
 
 export default async function Page() {
   const medicalServiceList = await getMedicalServices();
@@ -18,6 +19,7 @@ export default async function Page() {
           </Button>
         </Link>
         <ImportButtonDialog />
+        <ExportButton />
       </Stack>
 
       <MedicalServiceList medicalServiceList={medicalServiceList} />

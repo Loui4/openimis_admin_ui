@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -108,17 +108,17 @@ export function ImportButtonDialog() {
             {!loading && !isDryRunComplete && !isSuccess && (
               <>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DateTimePicker
+                  <DatePicker
                     label="Validity From"
                     value={validityFrom ? dayjs(validityFrom) : null}
                     onChange={(value) =>
-                      setValidityFrom(value?.isValid() ? value.toISOString() : "")
+                      setValidityFrom(value?.isValid() ? value.format("YYYY-MM-DD") : "")
                     }
                     slotProps={{
                       field: { clearable: true },
                       textField: {
                         fullWidth: true,
-                        helperText: "Leave blank to use today's date and time.",
+                        helperText: "Leave blank to use today's date.",
                       },
                     }}
                   />
