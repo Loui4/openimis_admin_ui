@@ -1,30 +1,29 @@
 "use client";
 
-import Link from "next/link";
-import { Button, Stack } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
 import { DataGridComponent } from "@/components/dataGrid";
 import { PriceList } from "@/interface";
-import {
-  GridColDef,
-  GridValueFormatter,
-  GridValueGetter,
-} from "@mui/x-data-grid";
+import { GridColDef, GridValueGetter } from "@mui/x-data-grid";
 import { FC, useMemo, useState } from "react";
 import {
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   IconButton,
   Menu,
   MenuItem,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  CircularProgress,
+  Typography,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useRouter } from "next/navigation";
 import { deletePriceList } from "@/services/priceList";
+
+const numberFormatter = new Intl.NumberFormat("en-MW");
 
 export const PriceListList: FC<{ priceLists: PriceList[] }> = ({
   priceLists,
@@ -99,27 +98,74 @@ export const PriceListList: FC<{ priceLists: PriceList[] }> = ({
     return toDateOrNull(value);
   };
 
-  const dateValueFormatter: GridValueFormatter = (value) => {
+  const formatDateValue = (value: unknown) => {
     const d = value as Date | null;
     if (!d) return "";
     return new Intl.DateTimeFormat("en-GB", {
       day: "2-digit",
       month: "short",
       year: "numeric",
-    }).format(d); // e.g. 25 Jan 2026
+    }).format(d);
   };
 
   const columns: GridColDef[] = useMemo(
     () => [
-      { field: "PLServiceID", headerName: "Service ID", flex: 1 },
-      { field: "PLServName", headerName: "Service Name", flex: 2 },
+      {
+        field: "PLServiceID",
+        headerName: "ID",
+        minWidth: 118,
+        flex: 0.7,
+        renderCell: (params) => (
+          <Chip
+            label={params.value}
+            size="small"
+            sx={{
+              borderRadius: 1,
+              bgcolor: "#eef6f7",
+              color: "#005565",
+              fontFamily: "monospace",
+              fontWeight: 700,
+              minWidth: 64,
+            }}
+          />
+        ),
+      },
+      {
+        field: "PLServName",
+        headerName: "Price List",
+        minWidth: 260,
+        flex: 2,
+        renderCell: (params) => (
+          <Box sx={{ minWidth: 0 }}>
+            <Typography
+              sx={{
+                color: "#17262b",
+                fontWeight: 650,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {params.value}
+            </Typography>
+            <Typography sx={{ color: "#728087", fontSize: 12 }}>
+              ID {params.row.PLServiceID}
+            </Typography>
+          </Box>
+        ),
+      },
 
       {
         field: "DatePL",
         headerName: "Price List Date",
+        minWidth: 164,
         flex: 1,
         valueGetter: dateValueGetter,
-        valueFormatter: dateValueFormatter,
+        renderCell: (params) => (
+          <Typography sx={{ color: "#42545b" }}>
+            {formatDateValue(params.value)}
+          </Typography>
+        ),
         sortComparator: (v1, v2) => {
           const t1 = (v1 as Date | null)?.getTime?.() ?? 0;
           const t2 = (v2 as Date | null)?.getTime?.() ?? 0;
@@ -127,17 +173,51 @@ export const PriceListList: FC<{ priceLists: PriceList[] }> = ({
         },
       },
 
-      { field: "NumberOfServices", headerName: "Number of Services", flex: 1 },
+      {
+        field: "NumberOfServices",
+        headerName: "Services",
+        minWidth: 132,
+        flex: 0.9,
+        type: "number",
+        renderCell: (params) => (
+          <Chip
+            label={numberFormatter.format(Number(params.value || 0))}
+            size="small"
+            sx={{
+              borderRadius: 1,
+              bgcolor: "#f3f1ec",
+              color: "#73510b",
+              fontWeight: 650,
+              minWidth: 56,
+            }}
+          />
+        ),
+      },
 
       {
         field: "actions",
         headerName: "",
         sortable: false,
-        flex: 0.5,
+        filterable: false,
+        width: 72,
+        align: "center",
+        headerAlign: "center",
         renderCell: (params) => (
           <IconButton
             onClick={(e) => handleMenuOpen(e, params.row as PriceList)}
             size="small"
+            aria-label={`Open actions for ${params.row.PLServName}`}
+            sx={{
+              width: 34,
+              height: 34,
+              border: "1px solid #dce5e8",
+              borderRadius: 1,
+              color: "#52636a",
+              bgcolor: "#fff",
+              "&:hover": {
+                bgcolor: "#f5f8f9",
+              },
+            }}
           >
             <MoreVertIcon />
           </IconButton>
@@ -148,74 +228,56 @@ export const PriceListList: FC<{ priceLists: PriceList[] }> = ({
   );
 
   return (
-    <Stack spacing={2}>
-      <Button
-        component={Link}
-        href="/price-lists/create"
-        variant="outlined"
-        color="primary"
-        startIcon={<AddIcon />}
-        sx={{
-          alignSelf: "flex-start",
-          borderRadius: 2,
-          textTransform: "none",
-          fontWeight: 500,
-          boxShadow: 2,
-          "&:hover": { boxShadow: 4 },
-        }}
+    <Box sx={{ width: "100%" }}>
+      <DataGridComponent
+        rows={priceLists}
+        columns={columns}
+        rowIdField="PLServiceID"
+        height={620}
+        searchPlaceholder="Search by price list name, ID, date, or service count"
+      />
+
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleMenuClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        Create Price List
-      </Button>
-
-      <div style={{ height: 400, width: "100%" }}>
-        <DataGridComponent
-          rows={priceLists}
-          columns={columns}
-          rowIdField="PLServiceID"
-        />
-
-        <Menu
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleMenuClose}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-          transformOrigin={{ vertical: "top", horizontal: "right" }}
+        <MenuItem
+          onClick={() => {
+            if (!selectedRow?.PLServiceID) return;
+            handleMenuClose();
+            router.push(`/price-lists/${selectedRow.PLServiceID}/view`);
+          }}
         >
-          <MenuItem
-            onClick={() => {
-              if (!selectedRow?.PLServiceID) return;
-              handleMenuClose();
-              router.push(`/price-lists/${selectedRow.PLServiceID}/view`);
-            }}
-          >
-            View
-          </MenuItem>
+          View
+        </MenuItem>
 
-          <MenuItem
-            onClick={() => {
-              if (!selectedRow?.PLServiceID) return;
-              handleMenuClose();
-              router.push(`/price-lists/${selectedRow.PLServiceID}/edit`);
-            }}
-          >
-            Edit
-          </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (!selectedRow?.PLServiceID) return;
+            handleMenuClose();
+            router.push(`/price-lists/${selectedRow.PLServiceID}/edit`);
+          }}
+        >
+          Edit
+        </MenuItem>
 
-          <MenuItem
-            onClick={() => {
-              if (!selectedRow?.PLServiceID) return;
-              handleMenuClose();
-              router.push(
-                `/price-lists/${selectedRow.PLServiceID}/attach-services`,
-              );
-            }}
-          >
-            Attach Services
-          </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (!selectedRow?.PLServiceID) return;
+            handleMenuClose();
+            router.push(
+              `/price-lists/${selectedRow.PLServiceID}/attach-services`,
+            );
+          }}
+        >
+          Attach Services
+        </MenuItem>
 
-          <MenuItem onClick={handleOpenDeleteConfirm}>Delete</MenuItem>
-        </Menu>
-      </div>
+        <MenuItem onClick={handleOpenDeleteConfirm}>Delete</MenuItem>
+      </Menu>
 
       <Dialog
         open={confirmOpen}
@@ -243,6 +305,6 @@ export const PriceListList: FC<{ priceLists: PriceList[] }> = ({
           </Button>
         </DialogActions>
       </Dialog>
-    </Stack>
+    </Box>
   );
 };

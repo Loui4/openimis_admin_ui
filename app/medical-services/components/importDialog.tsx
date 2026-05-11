@@ -84,8 +84,22 @@ export function ImportButtonDialog() {
         variant="outlined"
         startIcon={<CloudUploadIcon />}
         onClick={handleOpen}
+        sx={{
+          borderRadius: 1,
+          minHeight: 40,
+          px: 2,
+          textTransform: "none",
+          fontWeight: 700,
+          borderColor: "#c9d5d8",
+          color: "#274148",
+          bgcolor: "#fff",
+          "&:hover": {
+            borderColor: "#9fb4ba",
+            bgcolor: "#f8fbfb",
+          },
+        }}
       >
-        Import Medical Services
+        Import CSV
       </Button>
 
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>

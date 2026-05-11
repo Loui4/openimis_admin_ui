@@ -3,7 +3,7 @@ import { DataGridComponent } from "@/components/dataGrid";
 import { MedicalService } from "@/interface";
 import { GridColDef } from "@mui/x-data-grid";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { IconButton, Menu, MenuItem } from "@mui/material";
+import { Box, Chip, IconButton, Menu, MenuItem, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { FC, useCallback, useMemo, useState } from "react";
 import type { MouseEvent } from "react";
@@ -40,6 +40,23 @@ const formatReadableDate = (value: unknown) => {
   return readableDateFormatter.format(parsedDate);
 };
 
+const priceFormatter = new Intl.NumberFormat("en-MW", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+const fieldLabel = (value: unknown, fallback = "Not set") =>
+  value === null || value === undefined || value === "" ? fallback : String(value);
+
+const typeLabel = (value: unknown) => {
+  const label = fieldLabel(value);
+
+  if (label === "C") return "Clinical";
+  if (label === "S") return "Service";
+
+  return label;
+};
+
 export const MedicalServiceList: FC<{
   medicalServiceList: MedicalService[];
 }> = ({ medicalServiceList }) => {
@@ -71,24 +88,117 @@ export const MedicalServiceList: FC<{
 
   const columns: GridColDef[] = useMemo(
     () => [
-      { field: "ServCode", headerName: "Service Code", flex: 1 },
-      { field: "ServName", headerName: "Service Name", flex: 2 },
-      { field: "ServType", headerName: "Type" },
-      { field: "ServLevel", headerName: "Level" },
+      {
+        field: "ServCode",
+        headerName: "Code",
+        minWidth: 118,
+        flex: 0.8,
+        renderCell: (params) => (
+          <Chip
+            label={params.value}
+            size="small"
+            sx={{
+              borderRadius: 1,
+              bgcolor: "#eef6f7",
+              color: "#005565",
+              fontFamily: "monospace",
+              fontWeight: 700,
+              minWidth: 64,
+            }}
+          />
+        ),
+      },
+      {
+        field: "ServName",
+        headerName: "Service",
+        minWidth: 260,
+        flex: 2.2,
+        renderCell: (params) => (
+          <Box sx={{ minWidth: 0 }}>
+            <Typography
+              sx={{
+                color: "#17262b",
+                fontWeight: 650,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {params.value}
+            </Typography>
+            <Typography sx={{ color: "#728087", fontSize: 12 }}>
+              ID {params.row.ServiceID}
+            </Typography>
+          </Box>
+        ),
+      },
+      {
+        field: "ServType",
+        headerName: "Type",
+        minWidth: 120,
+        flex: 0.8,
+        renderCell: (params) => (
+          <Chip
+            label={typeLabel(params.value)}
+            size="small"
+            variant="outlined"
+            sx={{ borderRadius: 1, borderColor: "#ccd8dc", color: "#42545b" }}
+          />
+        ),
+      },
+      {
+        field: "ServLevel",
+        headerName: "Level",
+        minWidth: 86,
+        flex: 0.6,
+        renderCell: (params) => (
+          <Typography sx={{ fontWeight: 700, color: "#42545b" }}>
+            {fieldLabel(params.value)}
+          </Typography>
+        ),
+      },
       {
         field: "ServPrice",
         headerName: "Price (MWK)",
+        minWidth: 140,
         flex: 1,
         type: "number",
+        renderCell: (params) => (
+          <Typography sx={{ fontWeight: 700, color: "#17262b" }}>
+            {priceFormatter.format(Number(params.value || 0))}
+          </Typography>
+        ),
       },
-      { field: "ServCareType", headerName: "Care Type" },
+      {
+        field: "ServCareType",
+        headerName: "Care Type",
+        minWidth: 132,
+        flex: 0.9,
+        renderCell: (params) => (
+          <Chip
+            label={fieldLabel(params.value)}
+            size="small"
+            sx={{
+              borderRadius: 1,
+              bgcolor: "#f3f1ec",
+              color: "#73510b",
+              fontWeight: 650,
+            }}
+          />
+        ),
+      },
       // { field: "ServFrequency", headerName: "Frequency", flex: 1, type: "number" },
       // { field: "ServPatCat", headerName: "Patient Category", flex: 1 },
       {
         field: "ValidityFrom",
         headerName: "Validity From",
+        minWidth: 158,
         flex: 1,
-        valueFormatter: (value) => formatReadableDate(value),
+        renderCell: (params) => (
+          <Typography sx={{ color: "#42545b" }}>
+            {formatReadableDate(params.value)}
+          </Typography>
+        ),
       },
       // {
       //   field: "ValidityTo",
@@ -108,7 +218,9 @@ export const MedicalServiceList: FC<{
         headerName: "",
         sortable: false,
         filterable: false,
-        flex: 0.4,
+        width: 72,
+        align: "center",
+        headerAlign: "center",
         renderCell: (params) => (
           <IconButton
             aria-label={`Open actions for ${params.row.ServName}`}
@@ -116,6 +228,17 @@ export const MedicalServiceList: FC<{
               handleMenuOpen(event, params.row as MedicalService)
             }
             size="small"
+            sx={{
+              width: 34,
+              height: 34,
+              border: "1px solid #dce5e8",
+              borderRadius: 1,
+              color: "#52636a",
+              bgcolor: "#fff",
+              "&:hover": {
+                bgcolor: "#f5f8f9",
+              },
+            }}
           >
             <MoreVertIcon />
           </IconButton>
@@ -126,11 +249,13 @@ export const MedicalServiceList: FC<{
   );
 
   return (
-    <div style={{ height: 300, width: "100%" }}>
+    <Box sx={{ width: "100%" }}>
       <DataGridComponent
         rows={medicalServiceList}
         columns={columns}
         rowIdField="ServiceID"
+        height={620}
+        searchPlaceholder="Search by code, service name, care type, or price"
       />
       <Menu
         anchorEl={anchorEl}
@@ -145,6 +270,6 @@ export const MedicalServiceList: FC<{
           Update Price
         </MenuItem>
       </Menu>
-    </div>
+    </Box>
   );
 };

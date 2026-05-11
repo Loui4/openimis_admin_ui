@@ -38,8 +38,22 @@ export function ExportButton() {
       }
       onClick={handleExport}
       disabled={loading}
+      sx={{
+        borderRadius: 1,
+        minHeight: 40,
+        px: 2,
+        textTransform: "none",
+        fontWeight: 700,
+        borderColor: "#c9d5d8",
+        color: "#274148",
+        bgcolor: "#fff",
+        "&:hover": {
+          borderColor: "#9fb4ba",
+          bgcolor: "#f8fbfb",
+        },
+      }}
     >
-      Export Medical Services
+      Export CSV
     </Button>
   );
 }
